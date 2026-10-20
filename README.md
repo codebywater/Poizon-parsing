@@ -1,6 +1,6 @@
 # Poizon-parsing — сбор данных из приложения Dewu (得物 / Poizon)
 
-[![tests](https://github.com/gregreshetnyak52-crypto/Poizon-parsing-/actions/workflows/tests.yml/badge.svg)](https://github.com/gregreshetnyak52-crypto/Poizon-parsing-/actions/workflows/tests.yml)
+[![tests](https://github.com/greg2377/Poizon-parsing/actions/workflows/tests.yml/badge.svg)](https://github.com/greg2377/Poizon-parsing/actions/workflows/tests.yml)
 ![license](https://img.shields.io/badge/license-MIT-blue)
 
 > **English summary.** Free, open-source tool that drives the real Dewu (Poizon) mobile app on your own
@@ -103,7 +103,7 @@ python -m poizon ──► uiautomator2 (Android)  или  Appium + WebDriverAge
 3. Скачайте проект и поставьте зависимости:
 
 ```bash
-git clone https://github.com/gregreshetnyak52-crypto/Poizon-parsing-.git
+git clone https://github.com/greg2377/Poizon-parsing.git
 cd Poizon-parsing-
 python -m venv .venv
 # Windows:  .venv\Scripts\activate          macOS/Linux:  source .venv/bin/activate
@@ -201,7 +201,7 @@ Appium ставит на iPhone служебное приложение WebDrive
 ### 5.5. Python-окружение
 
 ```bash
-git clone https://github.com/gregreshetnyak52-crypto/Poizon-parsing-.git
+git clone https://github.com/greg2377/Poizon-parsing.git
 cd Poizon-parsing-
 python3 -m venv .venv
 source .venv/bin/activate
