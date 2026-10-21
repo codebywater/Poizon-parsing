@@ -103,6 +103,15 @@ class AndroidDevice:
         import uiautomator2 as u2
         self.d = u2.connect(serial)
 
+    def installed(self, package):
+        return package in self.d.app_list(package)
+
+    def foreground(self):
+        try:
+            return self.d.app_current().get("package")
+        except Exception:  # screen off or a system dialog: nothing in focus
+            return None
+
     def source(self):
         return self.d.dump_hierarchy()
 

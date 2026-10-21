@@ -6,12 +6,24 @@ from pathlib import Path
 
 
 def _device(a):
+    """Connect to the phone; on failure exit with a plain explanation instead of a traceback."""
     from .devices import AndroidDevice, IOSDevice
     if a.platform == "android":
-        return AndroidDevice(a.serial)
+        try:
+            return AndroidDevice(a.serial)
+        except Exception as e:
+            sys.exit("Не удалось подключиться к Android-телефону: " + str(e) + "\n"
+                     "Проверьте: телефон подключён по USB, включена «Отладка по USB», на телефоне разрешён "
+                     "доступ этому компьютеру, а `adb devices` показывает устройство со статусом device "
+                     "(README, раздел 4.2). Если устройств несколько — передайте --serial.")
     if not a.udid:
         sys.exit("--udid is required for iOS (find it with: idevice_id -l)")
-    return IOSDevice(a.udid, a.bundle_id, a.server, a.team_id, a.wda_bundle_id)
+    try:
+        return IOSDevice(a.udid, a.bundle_id, a.server, a.team_id, a.wda_bundle_id)
+    except Exception as e:
+        sys.exit(f"Не удалось подключиться к iPhone через Appium ({a.server}): {e}\n"
+                 "Проверьте: Appium запущен (команда appium в отдельном окне), iPhone подключён и доверяет "
+                 "этому Mac, WebDriverAgent подписан (README, разделы 5.4 и 6), bundle id верный (--bundle-id).")
 
 
 def _close(dev):
@@ -45,6 +57,12 @@ def main(argv=None):
     p.add_argument("--source", help="label saved with each product, e.g. 'Nike sneakers'")
     p.add_argument("--out", default="out/products.jsonl")
 
+    p = sub.add_parser("check", parents=[dev_args, texts],
+                       help="self-check: phone, app and what the parsers see on the current screen")
+    p.add_argument("--package", default=None,
+                   help="Android: Dewu package to look for (default com.shizhuang.duapp)")
+    p.add_argument("--save", help="folder to save screenshot, UI tree, texts and the report into")
+
     p = sub.add_parser("dump", parents=[dev_args], help="save screenshot + UI tree of the current screen")
     p.add_argument("--out", default="out/screen")
 
@@ -70,6 +88,17 @@ def main(argv=None):
             print(json.dumps(item, ensure_ascii=False, indent=1))
         elif a.cmd == "crawl":
             crawl(dev, a.out, a.max, a.break_every, a.source, a.buy_text, a.chart_text)
+        elif a.cmd == "check":
+            from .check import DEWU_ANDROID_PACKAGE, FAIL, WARN, diagnose, format_report, save_bundle, worst
+            package = a.package or (DEWU_ANDROID_PACKAGE if a.platform == "android" else None)
+            report = diagnose(dev, a.buy_text, package)
+            print(format_report(report))
+            if a.save:
+                files = save_bundle(dev, a.save, report)
+                print(f"\nСохранено в {a.save}: {', '.join(files)}")
+            status = worst(report)
+            if status != "ok":
+                sys.exit(2 if status == FAIL else 1)
         elif a.cmd == "dump":
             Path(a.out).parent.mkdir(parents=True, exist_ok=True)
             dev.screenshot(f"{a.out}.png")

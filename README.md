@@ -83,9 +83,11 @@ python -m poizon ──► uiautomator2 (Android)  или  Appium + WebDriverAge
 
 Общий порядок для любой платформы:
 
-1. **Проверка на одном товаре:** откройте товар в приложении → `python -m poizon item --platform …`.
-2. **Обход списка:** откройте категорию/поиск → `python -m poizon crawl --platform … --max 5`.
-3. **Выгрузка:** `python -m poizon export --rate 12.5` → `out/products.xlsx`.
+1. **Самопроверка:** откройте товар в приложении → `python -m poizon check --platform …`.
+   Всё зелёное — можно дальше; если нет, отчёт подскажет, что исправить (раздел 9).
+2. **Проверка на одном товаре:** `python -m poizon item --platform …`.
+3. **Обход списка:** откройте категорию/поиск → `python -m poizon crawl --platform … --max 5`.
+4. **Выгрузка:** `python -m poizon export --rate 12.5` → `out/products.xlsx`.
 
 ## 4. Android: установка и запуск
 
@@ -235,6 +237,7 @@ python -m poizon export --rate 12.5
 ## 7. Все команды и параметры
 
 ```
+python -m poizon check   --platform android|ios [устройство] [тексты] [--package ПАКЕТ] [--save ПАПКА]
 python -m poizon item    --platform android|ios [устройство] [тексты] [--out out/item.json]
 python -m poizon crawl   --platform android|ios [устройство] [тексты] [--max N] [--break-every N] [--source ТЕКСТ] [--out out/products.jsonl]
 python -m poizon dump    --platform android|ios [устройство] [--out out/screen]
@@ -255,6 +258,8 @@ python -m poizon export  [--in out/products.jsonl] [--out out/products] [--rate 
 | `--break-every` | 30 | пауза 30–90 с после каждых N товаров (0 — выключить) |
 | `--source` | — | метка, сохраняемая с каждым товаром (категория, запрос) |
 | `--rate` | — | курс CNY→RUB; добавляет колонку `price_rub` |
+| `--package` | `com.shizhuang.duapp` | `check`, Android: пакет приложения Dewu |
+| `--save` | — | `check`: сохранить скриншот, дерево экрана, тексты и отчёт в папку |
 
 **Как устроен обход (`crawl`):**
 
@@ -308,8 +313,16 @@ CSV сохраняется в кодировке, которую Excel откр�
 
 ## 9. Если что-то не работает
 
-Первое, что стоит сделать при любой проблеме: открыть нужный экран и выполнить
-`python -m poizon dump --platform …` — появятся `out/screen.png` и `out/screen.xml`. При ошибках обхода смотрите `out/errors/`.
+Первое, что стоит сделать при любой проблеме: открыть нужный экран и выполнить самопроверку
+
+```bash
+python -m poizon check --platform android --save out/check     # для iPhone: --platform ios --udid …
+```
+
+Она по шагам покажет, что работает, а что нет: телефон подключён, Dewu установлено и открыто, какой экран
+сейчас на телефоне и что парсер на нём видит (название, цены, карточки списка). С `--save` в папке появятся
+скриншот, дерево экрана, тексты и отчёт — этого достаточно, чтобы починить разбор, не имея вашего телефона.
+При ошибках обхода смотрите `out/errors/`.
 
 **Общие:**
 
