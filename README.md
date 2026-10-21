@@ -8,6 +8,7 @@
 > product title, article number, brand, **price for every size**, delivery options and the **size chart**.
 > It crawls a product list automatically, resumes after interruption and exports to CSV/Excel.
 > It does **not** bypass request signing, SSL pinning or any anti-bot protection.
+> **Status:** parsing and crawl logic are covered by tests (texts from real screenshots, simulated screens), but the tool has **not yet been run on a live phone**.
 > Quick start: `pip install -r requirements-android.txt` → open a product list in the app →
 > `python -m poizon crawl --platform android --max 5` → `python -m poizon export`. Docs below are in Russian.
 
@@ -78,7 +79,7 @@ python -m poizon ──► uiautomator2 (Android)  или  Appium + WebDriverAge
 |---|---|
 | Android-телефон и любой компьютер (Windows / macOS / Linux) | раздел 4 — самый простой путь |
 | iPhone и Mac | разделы 5–6 |
-| iPhone без Mac | пока не поддерживается: нужен Mac (хотя бы один раз для подписи) или Android-телефон |
+| iPhone без Mac | пока не поддерживается: Mac нужен при каждом запуске (на нём работает Appium, разделы 5–6), а с бесплатным Apple ID подпись WDA ещё и надо обновлять раз в 7 дней. Без Mac используйте Android-телефон (раздел 4) |
 
 Общий порядок для любой платформы:
 
@@ -104,8 +105,8 @@ python -m poizon ──► uiautomator2 (Android)  или  Appium + WebDriverAge
 
 ```bash
 git clone https://github.com/codebywater/Poizon-parsing.git
-cd Poizon-parsing-
-python -m venv .venv
+cd Poizon-parsing
+python -m venv .venv              # macOS/Linux: python3 -m venv .venv (Debian/Ubuntu: сначала sudo apt install python3-venv)
 # Windows:  .venv\Scripts\activate          macOS/Linux:  source .venv/bin/activate
 pip install -r requirements-android.txt
 ```
@@ -170,7 +171,7 @@ appium driver doctor xcuitest     # покажет, чего ещё не хва�
 
 ```bash
 idevice_id -l                                              # UDID телефона
-ideviceinstaller -l | grep -i -E "dewu|得物|siwu|duapp"    # bundle id приложения
+ideviceinstaller list | grep -i -E "dewu|得物|siwu|duapp"    # bundle id приложения (в ideviceinstaller до 1.2.0: -l)
 ```
 
 По умолчанию используется `com.siwuai.duapp` — это **неподтверждённое** значение. Если ваш отличается,
@@ -202,7 +203,7 @@ Appium ставит на iPhone служебное приложение WebDrive
 
 ```bash
 git clone https://github.com/codebywater/Poizon-parsing.git
-cd Poizon-parsing-
+cd Poizon-parsing
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements-ios.txt
@@ -314,7 +315,7 @@ CSV сохраняется в кодировке, которую Excel откр�
 
 | Симптом | Что делать |
 |---|---|
-| `title: null`, нет `sizes` | Приложение может рисовать текст не стандартными элементами. Пришлите `out/screen.xml` + `out/screen.png` (раздел 10) |
+| `title: null`, нет `sizes` | Приложение может рисовать текст нестандартными элементами. Пришлите `out/screen.xml` + `out/screen.png` (раздел 10) |
 | Нет `article`/`brand` | Блок «商品信息» дальше 4 прокруток или подписи другие. Пришлите дамп экрана с этим блоком |
 | Таблица размеров не открывается | Ссылка называется иначе: посмотрите текст на экране листа размеров и передайте `--chart-text "<текст>"` |
 | Обход: «not a product page» на каждой карточке | Кнопка покупки называется иначе: `--buy-text "<текст>"`, либо пришлите дамп страницы товара |

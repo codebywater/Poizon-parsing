@@ -1,7 +1,7 @@
 ---
 name: Парсер не сработал / Parser failed
 about: Пришлите дамп экрана, на котором данные не распознались
-labels: parser
+labels: bug
 ---
 
 **Платформа:** Android / iOS, модель телефона:
